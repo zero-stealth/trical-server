@@ -9,8 +9,8 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 
 session_start();
 
-include '../class/account.php';
-include '../config/database.php';
+include './class/account.php';
+include './config/database.php';
 
 $database = new Database;
 $db = $database->connect();

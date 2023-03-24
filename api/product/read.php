@@ -7,8 +7,8 @@ header("Content-Type: application/json; charset=UTF-8");
 
 //database connection will be here
 
-include_once '../config/database.php';
-include_once '../objects/product.php';
+include_once './config/database.php';
+include_once './class/product.php';
 
 //instantiate database and product
 

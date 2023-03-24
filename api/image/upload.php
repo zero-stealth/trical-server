@@ -6,7 +6,7 @@ header("Acess-Control-Allow-Methods: POST");
 header("Acess-Control-Allow-Headers: Acess-Control-Allow-Headers,Content-Type,Acess-Control-Allow-Methods, Authorization");
 
 // include database 
-include 'database.php'; 
+include './database.php'; 
 
 $data = json_decode(file_get_contents("php://input"), true); // collect input parameters and convert into readable format
 	

@@ -8,10 +8,10 @@ header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
  
 // get database connection
-include_once '../config/database.php';
+include_once './config/database.php';
  
 // instantiate product object
-include_once '../objects/product.php';
+include_once './class/product.php';
  
 $database = new Database();
 $db = $database->connect();
