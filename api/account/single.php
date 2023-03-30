@@ -9,8 +9,8 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 
 session_start();
 
-include './class/account.php';
-include './config/database.php';
+include '../../class/account.php';
+include '../../config/database.php';
 
 $database = new Database;
 $db = $database->connect();
@@ -26,7 +26,6 @@ if($account->username != null) {
         "username"=> $account-> username,
         "password"=> $account->password,
         "registration_time"=> $account->registration_time,
-        "account_active"=> $account->account_active,  
     );
 
     http_response_code(200);

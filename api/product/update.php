@@ -8,8 +8,8 @@ header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
  
 // include database and object files
-include_once './config/database.php';
-include_once './class/product.php';
+include_once '../../config/database.php';
+include_once '../../class/product.php';
  
 // get database connection
 $database = new Database();
@@ -27,6 +27,7 @@ $product->id = $data->id;
 // set product property values
 $product->name = $data->name;
 $product->price = $data->price;
+$product->imageData = $data->imageData;
 $product->description = $data->description;
 $product->category_id = $data->category_id;
  

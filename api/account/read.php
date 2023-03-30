@@ -7,9 +7,8 @@ header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-include './class/account.php';
-include './config/database.php';
-
+include '../../class/account.php';
+include '../../config/database.php';
 $database = new Database;
 $db = $database->connect();
 $account = new Account($db);
@@ -29,10 +28,8 @@ if ($data_count > 0) {
         $d = array(
             'id' => $id,
             'username' => $username,
-            'session_id' => $session_id,
             'password' => $password,
             'registration_time' => $registration_time,
-            'account_active' => $account_active,
         );
 
          // note - session_id and password should be removed in production

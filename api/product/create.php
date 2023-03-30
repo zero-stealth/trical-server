@@ -1,17 +1,16 @@
 <?php
-
-// required headers
+header("allowed_origins_patterns: *");
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
- 
+
 // get database connection
-include_once './config/database.php';
+include_once '../../config/database.php';
  
 // instantiate product object
-include_once './class/product.php';
+include_once '../../class/product.php';
  
 $database = new Database();
 $db = $database->connect();
@@ -26,6 +25,7 @@ $data = json_decode(file_get_contents("php://input"));
 if(
     !empty($data->name) &&
     !empty($data->price) &&
+    !empty($data->imageData) &&
     !empty($data->description) &&
     !empty($data->category_id)
 ){
@@ -33,9 +33,10 @@ if(
     // set product property values
     $product->name = $data->name;
     $product->price = $data->price;
+    $product->imageData = $data->imageData;
     $product->description = $data->description;
     $product->category_id = $data->category_id;
-    $product->created = date('Y-m-d H:i:s');
+    // $product->created = date('Y-m-d H:i:s');
  
     // create the product
     if($product->create()){

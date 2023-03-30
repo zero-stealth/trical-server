@@ -6,8 +6,8 @@ header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-include './class/account.php';
-include './config/database.php';
+include '../../class/account.php';
+include '../../config/database.php';
 
 $database = new Database;
 $db = $database->connect();
@@ -24,11 +24,13 @@ if ($account->create_account()) {
         array(
             "message" => "account created ",
             "account name" => "$account->username",
+            "account id" => "$account->id",
         )
     );
 } else {
     echo json_encode(
         array("message" => "account created",
+        "account id" => "$account->id",
         "account_name" => "$account->username",
         )
 

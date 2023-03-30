@@ -4,28 +4,19 @@ class Account
 
     //private
     private $conn;
-    public $id_auth;
-    public $authenticated;
+    public $username_auth;
 
     //public account data
     public $id;
+    public $email;
     public $username;
-    public $session_id;
     public $password;
     public $registration_time;
-    public $account_active;
-
-    //public session data
-    public $session_id_session;
-    public $account_id;
-    public $login;
-
 
     //db_table
     private $db_table = 'account';
-    private $db_table_session = 'session';
+    
     //intialize
-
     public function __construct($db)
     {
         $this->conn = $db;
@@ -35,11 +26,10 @@ class Account
     //GET ALL ACCOUNT
     public function get_accounts()
     {
-        $sql_query = "SELECT id, username , session_id, password , registration_time , account_active FROM " . $this->db_table . "";
+        $sql_query = "SELECT id, username , password , registration_time , email FROM " . $this->db_table . "";
         $stmt = $this->conn->prepare($sql_query);
         $stmt->execute();
         return $stmt;
-        // note - session_id and password should be removed in production
     }
 
     //CREATE ACCOUNT
@@ -51,7 +41,6 @@ class Account
         $password = trim($this->password);
 
         //check user is valid
-
         if (!$this->is_name_valid($username)) {
             throw new Exception('invalid username');
         }
@@ -63,31 +52,27 @@ class Account
 
         // check if user exists in database or same name
         if (!is_null($this->get_id_from_name($username))) {
-            throw new Exception('user name is already in use');
+            throw new Exception('user name is already in use dummy');
         }
 
         //add an account
-        $sql_query = "INSERT INTO " . $this->db_table . " SET  username = :username, password = :password, account_active = :account_active";
+        $sql_query = "INSERT INTO " . $this->db_table . " SET  username = :username, password = :password, email = :email";
         $stmt = $this->conn->prepare($sql_query);
 
         // hash password
         $hash = password_hash($password, PASSWORD_DEFAULT);
 
-        // intval $status is (1 = true)
-        $int_status = 1 ;
-
         // bind data
-        $value = array(':username' => $username, ':password' => $hash, ':account_active' => $int_status);
+        $value = array(':username' => $username, ':password' => $hash, ':email' => $this->email);
         // $stmt->bindParam(':username', $this->$username);
         // $stmt->bindParam(':password', $this->$hash);
+        // $stmt->bindParam(':password', $this->$email);
 
         try {
             $stmt->execute($value);
         } catch (PDOException $e) {
             throw new Exception($e->getMessage());
         }
-
-      
     }
 
     //santize username
@@ -162,7 +147,7 @@ class Account
     public function get_account()
 
     {
-        $sql_query = "SELECT id, username , password , registration_time , account_active FROM " . $this->db_table . " WHERE id = ? LIMIT 0,1 ";
+        $sql_query = "SELECT id, username , password , registration_time , email  FROM " . $this->db_table . " WHERE id = ? LIMIT 0,1 ";
         $stmt = $this->conn->prepare($sql_query);
         $stmt->bindParam(1, $this->id);
         $stmt->execute();
@@ -172,7 +157,7 @@ class Account
         $this->username = $data_row['username'];
         $this->password = $data_row['password'];
         $this->registration_time = $data_row['registration_time'];
-        $this->account_active = $data_row['account_active'];
+        $this->email = $data_row['email'];
     }
 
     //UPDATE ACCOUNT OR EDIT
@@ -188,7 +173,7 @@ class Account
             throw new Exception('invalid id');
         }
 
-       
+
         // check password is valid
         if (!$this->is_pass_valid($this->password)) {
             throw new Exception('invalid password');
@@ -202,19 +187,16 @@ class Account
             throw new Exception('user name is already in use');
         }
 
-        $sql_query = "UPDATE " . $this->db_table . " SET username = :username, password = :password , account_active = :account_active WHERE id = :id";
+        $sql_query = "UPDATE " . $this->db_table . " SET username = :username, password = :password WHERE id = :id";
         $stmt = $this->conn->prepare($sql_query);
 
         // hash password
-        $hash = password_hash($this->password, PASSWORD_DEFAULT);
-
-        // intval $status is (0 = failed, 1 = true)
-        $int_status = $this->account_active ? 1 : 0;
+        $hash = password_hash($password, PASSWORD_DEFAULT);
 
 
         // bind data
-        $value = array(':username' => $username, ':password' => $hash, ':account_active' => $int_status, ':id' => $this->id);
-        // $stmt->bindParam(':account_active', $this->int_status);
+        $value = array(':username' => $username, ':password' => $hash, ':id' => $this->id);
+        // $stmt->bindParam(':email', $this->email);
         // $stmt->bindParam(':username', $this->$username);
         // $stmt->bindParam(':password', $this->$hash);
         // $stmt->bindParam(':id', $this->id);
@@ -249,7 +231,7 @@ class Account
 
         //checks id
         if (!$this->is_id_valid($this->id)) {
-            throw new Exception('invalid account ID');
+            throw new Exception('invalid account_ID');
         }
 
         $sql_query = "DELETE FROM " . $this->db_table . " WHERE id = :id";
@@ -270,14 +252,6 @@ class Account
             throw new Exception($e->getMessage());
         }
 
-        //delete account session
-
-        $sql_query = "DELETE FROM " . $this->db_table_session . " WHERE account_id = :id";
-        $stmt = $this->conn->prepare($sql_query);
-
-        // bind param
-        $value = array(':id' => $this->id);
-        // $stmt->bindParam(':id', $this->id);
 
         try {
 
@@ -305,7 +279,7 @@ class Account
             return FALSE;
         }
 
-        $sql_query = "SELECT * FROM " . $this->db_table . " WHERE username = :username  AND account_active = 1";
+        $sql_query = "SELECT * FROM " . $this->db_table . " WHERE username = :username";
         $stmt = $this->conn->prepare($sql_query);
 
         // bind data
@@ -327,10 +301,8 @@ class Account
 
                 //if it matches, then set id and name
                 $this->id_auth = intval($data_set['id'], 10);
+                $this->username_auth = $username;
                 $this->authenticated = TRUE;
-
-                //register session
-                $this->register_login_session();
 
                 return TRUE;
             }
@@ -339,72 +311,6 @@ class Account
         return FALSE;
     }
 
-    //register login session 
-    private function register_login_session()
-    {
-
-        if (session_start() == PHP_SESSION_ACTIVE) {
-
-            // Use a REPLACE statement to insert a new row with the session id, if it doesn't exist or update.
-
-            $sql_query = " UPDATE " . $this->db_table_session . " SET session_id = :session_id , account_id = :id , login = NOW()";
-            $stmt = $this->conn->prepare($sql_query);
-
-         
-            // bind data
-            $value = array(':session_id' => session_id(), ':id' => $this->id_auth);
-            // $stmt->bindParam(':session_id', session_id());
-            // $stmt->bindParam(':account_id', $this->id);
-
-            try {   
-
-                $stmt->execute($value);
-            } catch (PDOException $e) {
-                throw new Exception($e->getMessage( ));
-            }
-        }
-    }
-
-    // login using session
-
-    public function session_login()
-    {
-
-        if (session_start() == PHP_SESSION_ACTIVE) {
-
-            //query for a session id that is not older than 7 days
-
-            $sql_query = "SELECT * FROM $this->db_table_session ,  $this->db_table WHERE $this->db_table_session.session_id = :sid" .
-                "AND $this->db_table_session.login >= (NOW() - INTERVAL 7 DAYS) AND $this->db_table_session.account_id = $this->db_table.id" .
-                "AND $this->db_table.account_active = 1";
-            $stmt = $this->conn->prepare($sql_query);
-
-            // bind data
-            $value = array(':sid' => session_id());
-            // $stmt->bindParam(':sid', session_id());
-
-
-            try {
-
-                $stmt->execute($value);
-            } catch (PDOException $e) {
-                throw new Exception($e->getMessage());
-            }
-
-            $data_set = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            if (is_array($data_set)) {
-                //auth succesful set class property
-                $this->id_auth = intval($data_set['id'], 10);
-                $this->authenticated = TRUE;
-
-                return TRUE;
-            }
-        }
-
-        //auth failed
-        return FALSE;
-    }
 
     //logout
     public function logout()
@@ -415,63 +321,7 @@ class Account
             return;
         }
 
-        //reset
-        $this->id_auth = null;
-        $this->authenticated = null;
-
-        //remove open session from the account_sessions table
-
-        if (session_status() == PHP_SESSION_ACTIVE)
-
-            //delete session
-        $sql_query = 'DELETE FROM ' . $this->db_table_session . " WHERE session_id = :sid";
-        $stmt = $this->conn->prepare($sql_query);
-
-        // bind data
-        $value = array(':sid' => session_id());
-        // $stmt->bindParam(':sid', session_id());
-
-        try {
-
-            $stmt->execute($value);
-        } catch (PDOException $e) {
-            throw new Exception($e->getMessage());
-        }
     }
 
-    //check if a user is authenticated
-    public function isAuthenticated()
-    {
-        return $this->authenticated;
-    }
-
-    //log out from other devices
-    public function close_other_session()
-    {
-
-        //check if there's no user's
-        if (is_null($this->id_auth)) {
-            return;
-        }
-
-        //check session on
-        if (session_status() == PHP_SESSION_ACTIVE) {
-
-            //delete all session execpt the current one
-
-            $sql_query = "DELETE FROM " . $this->db_table_session . "WHERE session_id != :sid AND account_id = :account_id ";
-            $stmt = $this->conn->prepare($sql_query);
-
-            // bind data
-            $value = array(':sid' => session_id(), ':account_id' => $this->id_auth);
-            // $stmt->bindParam(':sid', session_id(), ':account_id', $this->id_auth);
-
-            try {
-
-                $stmt->execute($value);
-            } catch (PDOException $e) {
-                throw new Exception($e->getMessage());
-            }
-        }
-    }
 }
+

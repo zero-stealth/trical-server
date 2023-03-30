@@ -7,8 +7,8 @@ header("Access-Control-Allow-Credentials: true");
 header('Content-Type: application/json');
  
 // include database and object files
-include_once './config/database.php';
-include_once './class/product.php';
+include_once '../../config/database.php';
+include_once '../../class/product.php';
  
 // get database connection
 $database = new Database();
@@ -28,6 +28,7 @@ if($product->name!=null){
     $product_arr = array(
         "id" =>  $product->id,
         "name" => $product->name,
+        "imageData" => $product->imageData,
         "description" => $product->description,
         "price" => $product->price,
         "category_id" => $product->category_id,

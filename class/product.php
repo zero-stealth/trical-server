@@ -9,6 +9,7 @@ class Product{
     // object properties
     public $id;
     public $name;
+	public $imageData;
     public $description;
     public $price;
     public $category_id;
@@ -26,7 +27,7 @@ class Product{
 	function read(){
 	 
 	    // select all query
-	    $query = "SELECT c.name as category_name, p.id, p.name, p.description, p.price, p.category_id, p.created FROM " . $this->table_name . " p LEFT JOIN categories c
+	    $query = "SELECT c.name as category_name, p.id, p.imagedata p.name, p.description, p.price, p.category_id, p.created FROM " . $this->table_name . " p LEFT JOIN categories c
 	  ON p.category_id = c.id ORDER BY p.created DESC";
 	 
 	    // prepare query statement
@@ -43,6 +44,7 @@ class Product{
 	     // sanitize
 	    $this->name=htmlspecialchars(strip_tags($this->name));
 	    $this->price=htmlspecialchars(strip_tags($this->price));
+	    $this->imageData=htmlspecialchars(strip_tags($this->imageData));
 	    $this->description=htmlspecialchars(strip_tags($this->description));
 	    $this->category_id=htmlspecialchars(strip_tags($this->category_id));
 	    $this->created=htmlspecialchars(strip_tags($this->created));
@@ -51,7 +53,7 @@ class Product{
 	    $query = "INSERT INTO
 	                " . $this->table_name . "
 	            SET
-	                name=".$this->name.", price=".$this->price.", description=".$this->description.", category_id=".$this->category_id.", created=".$this->created."";
+	                name=".$this->name.", imagedata=".$this->imageData.", price=".$this->price.", description=".$this->description.", category_id=".$this->category_id.", created=".$this->created."";
 	 
 	    // prepare query
 	    //$stmt = mysqli_query($this->conn,$query);
@@ -73,7 +75,7 @@ function readOne(){
  
     // query to read single record
     $query = "SELECT
-                c.name as category_name, p.id, p.name, p.description, p.price, p.category_id, p.created
+                c.name as category_name, p.id, p.name, p.imagedata, p.description, p.price, p.category_id, p.created
             FROM
                 " . $this->table_name . " p
                 LEFT JOIN
@@ -94,6 +96,7 @@ function readOne(){
     // set values to object properties
     $this->name = $row['name'];
     $this->price = $row['price'];
+    $this->imageData = $row['imageData'];
     $this->description = $row['description'];
     $this->category_id = $row['category_id'];
     $this->category_name = $row['category_name'];
@@ -108,6 +111,7 @@ function readOne(){
 	    // sanitize
 	    $this->name=htmlspecialchars(strip_tags($this->name));
 	    $this->price=htmlspecialchars(strip_tags($this->price));
+	    $this->imageData=htmlspecialchars(strip_tags($this->imageData));
 	    $this->description=htmlspecialchars(strip_tags($this->description));
 	    $this->category_id=htmlspecialchars(strip_tags($this->category_id));
 	    $this->id=htmlspecialchars(strip_tags($this->id));
@@ -118,6 +122,7 @@ function readOne(){
 	            SET
 	                name = :name,
 	                price = :price,
+	                imagedata = :imagedata,
 	                description = :description,
 	                category_id = :category_id
 	            WHERE
@@ -165,7 +170,7 @@ function readOne(){
 	 
 	    // select all query
 	    $query = "SELECT
-	                c.name as category_name, p.id, p.name, p.description, p.price, p.category_id, p.created
+	                c.name as category_name, p.id, p.name, p.imagedata , p.description, p.price, p.category_id, p.created
 	            FROM
 	                " . $this->table_name . " p
 	                LEFT JOIN
